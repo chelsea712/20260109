@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21点游戏 - Blackjack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a3d2e 0%, #0c5b47 100%);
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 5px solid #d4af37;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #eeeeee;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 25px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #d4af37;
+        }
+        
+        .player-info, .dealer-info, .game-status-info {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 1.2rem;
+            color: #d4af37;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .chips-value {
+            font-size: 2rem;
+            color: #4CAF50;
+        }
+        
+        .bet-value {
+            font-size: 2rem;
+            color: #FF9800;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .dealer-area, .player-area {
+            background-color: rgba(10, 61, 46, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #d4af37;
+            min-height: 200px;
+        }
+        
+        .area-title {
+            color: #d4af37;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.5);
+            padding-bottom: 10px;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            min-height: 140px;
+            align-items: center;
+        }
+        
+        .card {
+            width: 100px;
+            height: 140px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card.red {
+            background-color: #ffffff;
+            color: #d32f2f;
+            border: 1px solid #ccc;
+        }
+        
+        .card.black {
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        
+        .card.back {
+            background: linear-gradient(45deg, #1a237e, #283593);
+            color: white;
+            border: 2px solid #d4af37;
+        }
+        
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .card-suit {
+            font-size: 2.5rem;
+            text-align: center;
+        }
+        
+        .card-corner {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .card-corner.top {
+            align-self: flex-start;
+        }
+        
+        .card-corner.bottom {
+            align-self: flex-end;
+            transform: rotate(180deg);
+        }
+        
+        .controls-area {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+        }
+        
+        .betting-controls, .game-controls {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #d4af37;
+        }
+        
+        .section-title {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chips {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .chip {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 3px solid white;
+        }
+        
+        .chip:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .chip:active {
+            transform: scale(0.95);
+        }
+        
+        .chip-1 {
+            background: radial-gradient(circle at 30% 30%, #ff5252, #d32f2f);
+            color: white;
+        }
+        
+        .chip-5 {
+            background: radial-gradient(circle at 30% 30%, #2196F3, #0d47a1);
+            color: white;
+        }
+        
+        .chip-10 {
+            background: radial-gradient(circle at 30% 30%, #4CAF50, #1b5e20);
+            color: white;
+        }
+        
+        .chip-25 {
+            background: radial-gradient(circle at 30% 30%, #FF9800, #e65100);
+            color: white;
+        }
+        
+        .chip-100 {
+            background: radial-gradient(circle at 30% 30%, #9C27B0, #4a148c);
+            color: white;
+        }
+        
+        .bet-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .game-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        button:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .deal-btn {
+            background: linear-gradient(to bottom, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .hit-btn {
+            background: linear-gradient(to bottom, #2196F3, #1565C0);
+            color: white;
+        }
+        
+        .stand-btn {
+            background: linear-gradient(to bottom, #FF9800, #EF6C00);
+            color: white;
+        }
+        
+        .double-btn {
+            background: linear-gradient(to bottom, #9C27B0, #6A1B9A);
+            color: white;
+        }
+        
+        .split-btn {
+            background: linear-gradient(to bottom, #00BCD4, #00838F);
+            color: white;
+        }
+        
+        .insurance-btn {
+            background: linear-gradient(to bottom, #FFC107, #FF8F00);
+            color: #333;
+        }
+        
+        .clear-bet-btn {
+            background: linear-gradient(to bottom, #f44336, #c62828);
+            color: white;
+        }
+        
+        .instructions {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            margin-top: 10px;
+            border: 2px solid #d4af37;
+        }
+        
+        .instructions h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .instructions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            list-style-type: none;
+        }
+        
+        .instructions-list li {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .game-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10;
+            display: none;
+            border: 5px solid #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+            text-shadow: 2px 2px 0 #000;
+            animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.05); }
+        }
+        
+        .game-message.show {
+            display: block;
+        }
+        
+        .game-message.win {
+            color: #4CAF50;
+        }
+        
+        .game-message.lose {
+            color: #f44336;
+        }
+        
+        .game-message.tie {
+            color: #FFC107;
+        }
+        
+        .insurance-area {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px dashed #FFC107;
+            display: none;
+        }
+        
+        .insurance-area.show {
+            display: block;
+        }
+        
+        .insurance-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .footer {
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .cards-container {
+                gap: 10px;
+            }
+            
+            .card {
+                width: 80px;
+                height: 112px;
+            }
+            
+            .card-value {
+                font-size: 1.5rem;
+            }
+            
+            .card-suit {
+                font-size: 2rem;
+            }
+            
+            .game-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .info-value {
+                font-size: 2rem;
+            }
+            
+            .card {
+                width: 60px;
+                height: 84px;
+            }
+            
+            .card-value {
+                font-size: 1.2rem;
+            }
+            
+            .card-suit {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1><i class="fas fa-spade"></i> 21点游戏 <i class="fas fa-club"></i></h1>
+            <p class="subtitle">击败庄家，但不要超过21点！</p>
+        </div>
+        
+        <div class="game-info">
+            <div class="player-info">
+                <div class="info-label">玩家筹码</div>
+                <div class="info-value chips-value" id="chips">1000</div>
+            </div>
+            <div class="game-status-info">
+                <div class="info-label">当前下注</div>
+                <div class="info-value bet-value" id="currentBet">0</div>
+            </div>
+            <div class="dealer-info">
+                <div class="info-label">庄家点数</div>
+                <div class="info-value" id="dealerScore">-</div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="dealer-area">
+                <div class="area-title">庄家</div>
+                <div class="cards-container" id="dealerCards"></div>
+            </div>
+            
+            <div class="player-area">
+                <div class="area-title">玩家 <span id="playerScoreDisplay">点数: -</span></div>
+                <div class="cards-container" id="playerCards"></div>
+            </div>
+        </div>
+        
+        <div class="insurance-area" id="insuranceArea">
+            <div class="section-title">
+                <i class="fas fa-shield-alt"></i> 庄家明牌为A，是否购买保险？
+            </div>
+            <p style="text-align: center; margin-bottom: 15px; color: #FFC107;">
+                保险赌注为当前下注的一半。如果庄家拿到Blackjack，您将赢得2倍保险赌注。
+            </p>
+            <div class="insurance-options">
+                <button id="yesInsuranceBtn" class="insurance-btn"><i class="fas fa-check"></i> 购买保险</button>
+                <button id="noInsuranceBtn" class="insurance-btn"><i class="fas fa-times"></i> 不购买</button>
+            </div>
+        </div>
+        
+        <div class="controls-area">
+            <div class="betting-controls">
+                <div class="section-title"><i class="fas fa-coins"></i> 下注区域</div>
+                <div class="chips">
+                    <div class="chip chip-1" data-value="1">$1</div>
+                    <div class="chip chip-5" data-value="5">$5</div>
+                    <div class="chip chip-10" data-value="10">$10</div>
+                    <div class="chip chip-25" data-value="25">$25</div>
+                    <div class="chip chip-100" data-value="100">$100</div>
+                </div>
+                <div class="bet-actions">
+                    <button id="clearBetBtn" class="clear-bet-btn"><i class="fas fa-trash-alt"></i> 清空下注</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <div class="section-title"><i class="fas fa-gamepad"></i> 游戏控制</div>
+                <div class="game-buttons">
+                    <button id="dealBtn" class="deal-btn"><i class="fas fa-play"></i> 发牌</button>
+                    <button id="hitBtn" class="hit-btn" disabled><i class="fas fa-plus"></i> 要牌</button>
+                    <button id="standBtn" class="stand-btn" disabled><i class="fas fa-hand-paper"></i> 停牌</button>
+                    <button id="doubleBtn" class="double-btn" disabled><i class="fas fa-exchange-alt"></i> 双倍下注</button>
+                    <button id="splitBtn" class="split-btn" disabled><i class="fas fa-code-branch"></i> 分牌</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 游戏规则</h3>
+            <ul class="instructions-list">
+                <li><i class="fas fa-star" style="color:#d4af37;"></i> 目标：使手中的牌点数之和接近21点，但不能超过</li>
+                <li><i class="fas fa-star" style="color:#d4af37;"></i> A可以算作1点或11点，J、Q、K算作10点</li>
+                <li><i class="fas fa-star" style="color:#d4af37;"></i> Blackjack（A+10点牌）赔付1.5倍</li>
+                <li><i class="fas fa-star" style="color:#d4af37;"></i> 双倍下注：加倍下注并只能再要一张牌</li>
+                <li><i class="fas fa-star" style="color:#d4af37;"></i> 分牌：如果两张牌点数相同，可以分成两手牌</li>
+            </ul>
+        </div>
+        
+        <div class="game-message" id="gameMessage"></div>
+        
+        <div class="footer">
+            <p>21点游戏 &copy; 2023 | 使用HTML、CSS和JavaScript创建 | 仅供娱乐</p>
+        </div>
+    </div>
+
+    <script>
+        // 游戏变量
+        const dealerCardsElement = document.getElementById('dealerCards');
+        const playerCardsElement = document.getElementById('playerCards');
+        const chipsElement = document.getElementById('chips');
+        const currentBetElement = document.getElementById('currentBet');
+        const dealerScoreElement = document.getElementById('dealerScore');
+        const playerScoreDisplayElement = document.getElementById('playerScoreDisplay');
+        const gameMessageElement = document.getElementById('gameMessage');
+        const insuranceAreaElement = document.getElementById('insuranceArea');
+        
+        // 按钮元素
+        const dealBtn = document.getElementById('dealBtn');
+        const hitBtn = document.getElementById('hitBtn');
+        const standBtn = document.getElementById('standBtn');
+        const doubleBtn = document.getElementById('doubleBtn');
+        const splitBtn = document.getElementById('splitBtn');
+        const clearBetBtn = document.getElementById('clearBetBtn');
+        const yesInsuranceBtn = document.getElementById('yesInsuranceBtn');
+        const noInsuranceBtn = document.getElementById('noInsuranceBtn');
+        
+        // 筹码元素
+        const chipElements = document.querySelectorAll('.chip');
+        
+        // 游戏状态
+        let gameState = 'betting'; // betting, dealing, playerTurn, dealerTurn, gameOver
+        let playerHand = [];
+        let dealerHand = [];
+        let deck = [];
+        let chips = 1000;
+        let currentBet = 0;
+        let insuranceBet = 0;
+        let playerScore = 0;
+        let dealerScore = 0;
+        let playerHasBlackjack = false;
+        let dealerHasBlackjack = false;
+        
+        // 卡牌花色和值
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        
+        // 初始化游戏
+        function initGame() {
+            updateUI();
+            createDeck();
+            shuffleDeck();
+        }
+        
+        // 创建牌组
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({
+                        suit: suit,
+                        value: value,
+                        color: (suit === '♥' || suit === '♦') ? 'red' : 'black'
+                    });
+                }
+            }
+        }
+        
+        // 洗牌
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+        
+        // 发一张牌
+        function dealCard() {
+            return deck.pop();
+        }
+        
+        // 计算手牌点数
+        function calculateScore(hand) {
+            let score = 0;
+            let aces = 0;
+            
+            for (let card of hand) {
+                if (card.value === 'A') {
+                    aces++;
+                    score += 11;
+                } else if (['K', 'Q', 'J'].includes(card.value)) {
+                    score += 10;
+                } else {
+                    score += parseInt(card.value);
+                }
+            }
+            
+            // 处理Ace
+            while (score > 21 && aces > 0) {
+                score -= 10;
+                aces--;
+            }
+            
+            return score;
+        }
+        
+        // 更新UI
+        function updateUI() {
+            chipsElement.textContent = `$${chips}`;
+            currentBetElement.textContent = `$${currentBet}`;
+            
+            // 更新玩家点数显示
+            if (playerHand.length > 0) {
+                playerScore = calculateScore(playerHand);
+                playerScoreDisplayElement.textContent = `点数: ${playerScore}`;
+            }
+            
+            // 更新庄家点数显示
+            if (dealerHand.length > 0) {
+                // 如果游戏进行中且不是庄家回合，只显示第一张牌的点数
+                if (gameState !== 'dealerTurn' && gameState !== 'gameOver') {
+                    const firstCard = dealerHand[0];
+                    let firstCardValue = 0;
+                    
+                    if (firstCard.value === 'A') {
+                        firstCardValue = 11;
+                    } else if (['K', 'Q', 'J'].includes(firstCard.value)) {
+                        firstCardValue = 10;
+                    } else {
+                        firstCardValue = parseInt(firstCard.value);
+                    }
+                    
+                    dealerScoreElement.textContent = `${firstCardValue}+`;
+                } else {
+                    dealerScore = calculateScore(dealerHand);
+                    dealerScoreElement.textContent = dealerScore;
+                }
+            } else {
+                dealerScoreElement.textContent = '-';
+            }
+            
+            // 更新按钮状态
+            updateButtonStates();
+            
+            // 渲染手牌
+            renderHands();
+        }
+        
+        // 更新按钮状态
+        function updateButtonStates() {
+            const canDouble = currentBet * 2 <= chips && playerHand.length === 2;
+            const canSplit = playerHand.length === 2 && 
+                            playerHand[0].value === playerHand[1].value && 
+                            currentBet * 2 <= chips;
+            
+            // 根据游戏状态启用/禁用按钮
+            switch(gameState) {
+                case 'betting':
+                    dealBtn.disabled = currentBet === 0;
+                    hitBtn.disabled = true;
+                    standBtn.disabled = true;
+                    doubleBtn.disabled = true;
+                    splitBtn.disabled = true;
+                    break;
+                    
+                case 'playerTurn':
+                    dealBtn.disabled = true;
+                    hitBtn.disabled = false;
+                    standBtn.disabled = false;
+                    doubleBtn.disabled = !canDouble;
+                    splitBtn.disabled = !canSplit;
+                    break;
+                    
+                case 'dealerTurn':
+                case 'gameOver':
+                    dealBtn.disabled = false;
+                    hitBtn.disabled = true;
+                    standBtn.disabled = true;
+                    doubleBtn.disabled = true;
+                    splitBtn.disabled = true;
+                    break;
+            }
+            
+            // 如果玩家点数达到21，自动禁用要牌按钮
+            if (playerScore >= 21) {
+                hitBtn.disabled = true;
+                doubleBtn.disabled = true;
+            }
+        }
+        
+        // 渲染手牌
+        function renderHands() {
+            // 清空手牌显示
+            dealerCardsElement.innerHTML = '';
+            playerCardsElement.innerHTML = '';
+            
+            // 渲染庄家手牌
+            for (let i = 0; i < dealerHand.length; i++) {
+                const card = dealerHand[i];
+                
+                // 如果不是庄家回合且不是第一张牌，显示牌背
+                if (gameState !== 'dealerTurn' && gameState !== 'gameOver' && i > 0) {
+                    const cardElement = createCardElement(null, true);
+                    dealerCardsElement.appendChild(cardElement);
+                } else {
+                    const cardElement = createCardElement(card, false);
+                    dealerCardsElement.appendChild(cardElement);
+                }
+            }
+            
+            // 渲染玩家手牌
+            for (let card of playerHand) {
+                const cardElement = createCardElement(card, false);
+                playerCardsElement.appendChild(cardElement);
+            }
+        }
+        
+        // 创建卡牌元素
+        function createCardElement(card, isBack) {
+            const cardElement = document.createElement('div');
+            
+            if (isBack) {
+                cardElement.className = 'card back';
+                cardElement.innerHTML = `
+                    <div style="font-size: 3rem; text-align: center; margin-top: 30px;">♠</div>
+                `;
+            } else {
+                cardElement.className = `card ${card.color}`;
+                cardElement.innerHTML = `
+                    <div class="card-corner top">${card.value}${card.suit}</div>
+                    <div class="card-suit">${card.suit}</div>
+                    <div class="card-corner bottom">${card.value}${card.suit}</div>
+                `;
+            }
+            
+            return cardElement;
+        }
+        
+        // 下注
+        function placeBet(amount) {
+            if (gameState !== 'betting') return;
+            
+            if (chips >= amount) {
+                currentBet += parseInt(amount);
+                chips -= parseInt(amount);
+                updateUI();
+                playChipSound();
+            }
+        }
+        
+        // 清空下注
+        function clearBet() {
+            if (gameState !== 'betting') return;
+            
+            chips += currentBet;
+            currentBet = 0;
+            updateUI();
+        }
+        
+        // 开始游戏
+        function deal() {
+            if (gameState !== 'betting' || currentBet === 0) return;
+            
+            // 重置游戏状态
+            playerHand = [];
+            dealerHand = [];
+            playerHasBlackjack = false;
+            dealerHasBlackjack = false;
+            insuranceBet = 0;
+            
+            // 发牌
+            playerHand.push(dealCard());
+            dealerHand.push(dealCard());
+            playerHand.push(dealCard());
+            dealerHand.push(dealCard());
+            
+            // 检查Blackjack
+            playerScore = calculateScore(playerHand);
+            dealerScore = calculateScore(dealerHand);
+            
+            playerHasBlackjack = playerScore === 21;
+            dealerHasBlackjack = dealerScore === 21;
+            
+            // 更新游戏状态
+            gameState = 'dealing';
+            
+            // 如果庄家明牌是A，显示保险选项
+            if (dealerHand[0].value === 'A') {
+                showInsuranceOption();
+            } else {
+                // 否则直接进入玩家回合
+                if (playerHasBlackjack || dealerHasBlackjack) {
+                    endGame();
+                } else {
+                    gameState = 'playerTurn';
+                }
+            }
+            
+            updateUI();
+            playDealSound();
+        }
+        
+        // 显示保险选项
+        function showInsuranceOption() {
+            insuranceAreaElement.classList.add('show');
+        }
+        
+        // 隐藏保险选项
+        function hideInsuranceOption() {
+            insuranceAreaElement.classList.remove('show');
+        }
+        
+        // 购买保险
+        function buyInsurance() {
+            if (chips >= currentBet / 2) {
+                insuranceBet = currentBet / 2;
+                chips -= insuranceBet;
+                hideInsuranceOption();
+                
+                // 检查庄家是否有Blackjack
+                if (dealerHasBlackjack) {
+                    // 支付保险
+                    chips += insuranceBet * 3; // 1.5倍原始下注 + 保险赌注
+                    showMessage("庄家有Blackjack！保险赔付", "win");
+                    endGame();
+                } else {
+                    // 进入玩家回合
+                    gameState = 'playerTurn';
+                    updateUI();
+                    showMessage("庄家没有Blackjack，游戏继续", "info");
+                }
+            }
+        }
+        
+        // 不购买保险
+        function declineInsurance() {
+            hideInsuranceOption();
+            
+            // 检查是否有Blackjack
+            if (playerHasBlackjack && dealerHasBlackjack) {
+                // 平局
+                chips += currentBet;
+                showMessage("双方都有Blackjack，平局！", "tie");
+                endGame();
+            } else if (dealerHasBlackjack) {
+                // 庄家有Blackjack，玩家没有
+                showMessage("庄家有Blackjack！你输了", "lose");
+                endGame();
+            } else if (playerHasBlackjack) {
+                // 玩家有Blackjack，庄家没有
+                chips += currentBet * 2.5; // 1.5倍赔付
+                showMessage("Blackjack！你赢了1.5倍", "win");
+                endGame();
+            } else {
+                // 都没有Blackjack，进入玩家回合
+                gameState = 'playerTurn';
+                updateUI();
+            }
+        }
+        
+        // 玩家要牌
+        function hit() {
+            if (gameState !== 'playerTurn') return;
+            
+            playerHand.push(dealCard());
+            playerScore = calculateScore(playerHand);
+            
+            playCardSound();
+            
+            // 检查是否爆牌
+            if (playerScore > 21) {
+                showMessage("爆牌！你输了", "lose");
+                endGame();
+            } else if (playerScore === 21) {
+                // 自动停牌
+                stand();
+            } else {
+                updateUI();
+            }
+        }
+        
+        // 玩家停牌
+        function stand() {
+            if (gameState !== 'playerTurn') return;
+            
+            gameState = 'dealerTurn';
+            dealerPlay();
+        }
+        
+        // 双倍下注
+        function doubleDown() {
+            if (gameState !== 'playerTurn' || chips < currentBet || playerHand.length !== 2) return;
+            
+            // 加倍下注
+            chips -= currentBet;
+            currentBet *= 2;
+            
+            // 要一张牌
+            playerHand.push(dealCard());
+            playerScore = calculateScore(playerHand);
+            
+            playCardSound();
+            
+            // 检查是否爆牌
+            if (playerScore > 21) {
+                showMessage("双倍下注后爆牌！你输了", "lose");
+                endGame();
+            } else {
+                // 自动停牌
+                stand();
+            }
+        }
+        
+        // 庄家回合
+        function dealerPlay() {
+            // 显示庄家所有牌
+            dealerScore = calculateScore(dealerHand);
+            
+            // 庄家规则：点数小于17必须要牌
+            const interval = setInterval(() => {
+                if (dealerScore < 17) {
+                    dealerHand.push(dealCard());
+                    dealerScore = calculateScore(dealerHand);
+                    updateUI();
+                    playCardSound();
+                    
+                    if (dealerScore > 21) {
+                        clearInterval(interval);
+                        // 庄家爆牌，玩家赢
+                        chips += currentBet * 2;
+                        showMessage("庄家爆牌！你赢了", "win");
+                        endGame();
+                    }
+                } else {
+                    clearInterval(interval);
+                    // 比较点数
+                    compareHands();
+                }
+            }, 1000);
+        }
+        
+        // 比较手牌
+        function compareHands() {
+            playerScore = calculateScore(playerHand);
+            dealerScore = calculateScore(dealerHand);
+            
+            if (playerScore > dealerScore) {
+                chips += currentBet * 2;
+                showMessage(`你赢了！${playerScore} vs ${dealerScore}`, "win");
+            } else if (playerScore < dealerScore) {
+                showMessage(`你输了！${playerScore} vs ${dealerScore}`, "lose");
+            } else {
+                chips += currentBet;
+                showMessage(`平局！${playerScore} vs ${dealerScore}`, "tie");
+            }
+            
+            endGame();
+        }
+        
+        // 结束游戏
+        function endGame() {
+            gameState = 'gameOver';
+            updateUI();
+            
+            // 如果筹码为0，提供重置选项
+            if (chips <= 0) {
+                setTimeout(() => {
+                    if (confirm("你的筹码用完了！是否重新开始游戏？")) {
+                        resetGame();
+                    }
+                }, 1500);
+            }
+        }
+        
+        // 重置游戏
+        function resetGame() {
+            chips = 1000;
+            currentBet = 0;
+            playerHand = [];
+            dealerHand = [];
+            gameState = 'betting';
+            hideInsuranceOption();
+            gameMessageElement.classList.remove('show');
+            createDeck();
+            shuffleDeck();
+            updateUI();
+        }
+        
+        // 显示消息
+        function showMessage(message, type) {
+            gameMessageElement.textContent = message;
+            gameMessageElement.className = `game-message show ${type}`;
+            
+            setTimeout(() => {
+                gameMessageElement.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 播放音效
+        function playChipSound() {
+            // 模拟筹码声音
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 300;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponential
+                
